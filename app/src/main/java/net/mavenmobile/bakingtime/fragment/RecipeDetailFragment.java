@@ -31,6 +31,9 @@ import net.mavenmobile.bakingtime.model.Step;
 import net.mavenmobile.bakingtime.rest.ApiClient;
 import net.mavenmobile.bakingtime.rest.ApiInterface;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -53,6 +56,7 @@ public class RecipeDetailFragment extends Fragment {
 
     private Context mContext;
     private SimpleExoPlayer mPlayer;
+    private List<Step> mStepList;
     private Step step;
     private ApiInterface apiService;
     private String TAG = "RecipeDetailFragment: ";
@@ -90,8 +94,26 @@ public class RecipeDetailFragment extends Fragment {
         if (args != null) {
             step = args.getParcelable("step");
         }
+        initButton();
         initView(step);
         return view;
+    }
+
+    private void initButton() {
+        mButtonPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                initView(step);
+                Toast.makeText(getContext(), " PREV", Toast.LENGTH_SHORT).show();
+            }
+        });
+        mButtonNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                initView(step);
+                Toast.makeText(getContext(), "NEXT", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void initView(Step step) {
@@ -100,20 +122,6 @@ public class RecipeDetailFragment extends Fragment {
         if (!videoUrl.isEmpty()) {
             initPlayer(videoUrl);
         }
-
-        mButtonPrev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(), " PREV", Toast.LENGTH_SHORT).show();
-            }
-        });
-        mButtonNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(), "NEXT", Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
 
     private void initPlayer(String url) {

@@ -39,7 +39,7 @@ public class RecipeListActivity extends AppCompatActivity implements StepAdapter
     private IngredietAdapter mIngredientAdapter;
     private List<Ingredient> mIngredientList;
     private StepAdapter mStepAdapter;
-    private List<Step> mStepList = new ArrayList<>();
+    private List<Step> mStepList;
     private boolean mTwoPane;
 
     @Override
@@ -88,7 +88,6 @@ public class RecipeListActivity extends AppCompatActivity implements StepAdapter
 
     @Override
     public void onItemClick(Step step) {
-        Step step = mStepList = new ArrayList<>();
         if (mTwoPane) {
             Bundle args = new Bundle();
             args.putParcelable("step", step);

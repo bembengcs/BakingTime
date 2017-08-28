@@ -6,10 +6,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ import net.mavenmobile.bakingtime.rest.ApiClient;
 import net.mavenmobile.bakingtime.rest.ApiInterface;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -79,6 +82,11 @@ public class RecipeDetailFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         position = getArguments().getInt("position");
+        ArrayList<Step> stepArray = getArguments().getParcelableArrayList("stepList");
+        mStepList = new ArrayList<>();
+        mStepList.addAll(stepArray);
+
+        step = mStepList.get(position);
     }
 
     @Override
@@ -90,10 +98,6 @@ public class RecipeDetailFragment extends Fragment {
 
         apiService = ApiClient.getClient().create(ApiInterface.class);
 
-        Bundle args = getArguments();
-        if (args != null) {
-            step = args.getParcelable("step");
-        }
         initButton();
         initView(step);
         return view;
@@ -103,15 +107,21 @@ public class RecipeDetailFragment extends Fragment {
         mButtonPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                initView(step);
-                Toast.makeText(getContext(), " PREV", Toast.LENGTH_SHORT).show();
+                if (position > 0) {
+                    position-=1;
+                    Step step = mStepList.get(position);
+                    initView(step);
+                }
             }
         });
         mButtonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                initView(step);
-                Toast.makeText(getContext(), "NEXT", Toast.LENGTH_SHORT).show();
+                if (position < mStepList.size()) {
+                    position+=1;
+                    Step step = mStepList.get(position);
+                    initView(step);
+                }
             }
         });
     }
@@ -119,8 +129,10 @@ public class RecipeDetailFragment extends Fragment {
     private void initView(Step step) {
         mTvStepDesc.setText(step.getDescription());
         String videoUrl = step.getVideoURL();
-        if (!videoUrl.isEmpty()) {
+        if (!TextUtils.isEmpty(videoUrl)) {
             initPlayer(videoUrl);
+        } else {
+            mExoPlayer.setVisibility(View.GONE);
         }
     }
 

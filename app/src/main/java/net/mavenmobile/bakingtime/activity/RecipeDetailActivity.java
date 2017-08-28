@@ -1,6 +1,7 @@
 package net.mavenmobile.bakingtime.activity;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import net.mavenmobile.bakingtime.rest.ApiClient;
 import net.mavenmobile.bakingtime.rest.ApiInterface;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -39,15 +41,21 @@ public class RecipeDetailActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         apiService = ApiClient.getClient().create(ApiInterface.class);
-        step = getIntent().getExtras().getParcelable("step");
+        position = getIntent().getIntExtra("position", -1);
+        ArrayList<Step> stepArray = getIntent().getParcelableArrayListExtra("stepList");
+        mStepList.addAll(stepArray);
 
-        Bundle args = new Bundle();
-        args.putParcelable("step", step);
+        step = mStepList.get(position);
+
+
 
         if (savedInstanceState == null) {
             RecipeDetailFragment detailFragment = new RecipeDetailFragment();
             FragmentManager fm = getSupportFragmentManager();
-            detailFragment.setArguments(args);
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("stepList", stepArray);
+            bundle.putInt("position", position);
+            detailFragment.setArguments(bundle);
             fm.beginTransaction()
                     .add(R.id.fragment_container, detailFragment)
                     .commit();

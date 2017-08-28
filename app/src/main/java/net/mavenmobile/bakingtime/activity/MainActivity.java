@@ -8,6 +8,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import net.mavenmobile.bakingtime.R;
@@ -30,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.OnI
 
     @BindView(R.id.rv_recipe_card)
     RecyclerView mRvRecipeCard;
+    @BindView(R.id.progressBar)
+    ProgressBar mProgressBar;
     private ApiInterface apiService;
     private RecipeAdapter mRecipeCardAdapter;
 
@@ -52,13 +56,13 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.OnI
             public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
                 List<Recipe> recipes = response.body();
                 setupRecipeAdapter(recipes);
-                Log.d(TAG, "recipes received: " + recipes.size());
+                mProgressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure(Call<List<Recipe>> call, Throwable t) {
-                Log.e(TAG, t.toString());
-                Toast.makeText(MainActivity.this, "Failed to connect, you need internet connection", Toast.LENGTH_SHORT).show();
+                mProgressBar.setVisibility(View.GONE);
+                Toast.makeText(MainActivity.this, "Failed to connect, you need internet connection", Toast.LENGTH_LONG).show();
             }
         });
     }

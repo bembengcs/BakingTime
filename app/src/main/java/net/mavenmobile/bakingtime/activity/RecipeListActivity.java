@@ -19,6 +19,7 @@ import net.mavenmobile.bakingtime.rest.ApiClient;
 import net.mavenmobile.bakingtime.rest.ApiInterface;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -87,10 +88,16 @@ public class RecipeListActivity extends AppCompatActivity implements StepAdapter
     }
 
     @Override
-    public void onItemClick(Step step) {
+    public void onItemClick(int position) {
+
+        ArrayList<Step> stepArray = new ArrayList<>();
+        stepArray.addAll(mStepList);
+
+
         if (mTwoPane) {
             Bundle args = new Bundle();
-            args.putParcelable("step", step);
+            args.putParcelableArrayList("stepList", stepArray);
+            args.putInt("position", position);
             RecipeDetailFragment detailFragment = new RecipeDetailFragment();
             FragmentManager fm = getSupportFragmentManager();
             detailFragment.setArguments(args);
@@ -99,9 +106,8 @@ public class RecipeListActivity extends AppCompatActivity implements StepAdapter
                     .commit();
         } else {
             Intent intent = new Intent(this, RecipeDetailActivity.class);
-            Bundle args = new Bundle();
-            args.putParcelable("step", step);
-            intent.putExtras(args);
+            intent.putExtra("stepList", stepArray);
+            intent.putExtra("position", position);
             startActivity(intent);
         }
     }

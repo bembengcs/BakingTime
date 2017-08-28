@@ -47,7 +47,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
             ButterKnife.bind(this, itemView);
         }
 
-        public void bind(final Step step) {
+        public void bind(final Step step, final int position) {
 
             if (step.getId() == 0) {
                 mTvStepNumber.setText("Introduction");
@@ -59,7 +59,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
             mRelativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mOnItemClickListener.onItemClick(step);
+                    mOnItemClickListener.onItemClick(position);
                 }
             });
 
@@ -68,13 +68,13 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_step, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.item_list_step, parent, false);
         return new MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        holder.bind(mStepList.get(position));
+        holder.bind(mStepList.get(position), position);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Step step);
+        void onItemClick(int position);
     }
 
 }

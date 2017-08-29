@@ -12,10 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.MainActivity"
-            >
-            <!-- This is magic line -->
-            <!--android:configChanges="screenSize|orientation|keyboardHidden"-->
+            android:name=".activity.MainActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -25,9 +22,8 @@
         </activity>
         <activity android:name=".activity.RecipeListActivity">
         </activity>
-        <activity android:name=".activity.RecipeDetailActivity">
-        </activity>
-        <activity android:name=".activity.RecipeDetailTestActivity">
+        <activity
+            android:name=".activity.RecipeDetailActivity">
         </activity>
     </application>
 </manifest>

@@ -37,7 +37,10 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.5.1'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.google.android.exoplayer:exoplayer:r2.4.0'
+    compile 'com.google.android.exoplayer:exoplayer:r2.5.1'
+    compile 'com.google.android.exoplayer:exoplayer-core:r2.5.1'
+    compile 'com.google.android.exoplayer:exoplayer-dash:r2.5.1'
+    compile 'com.google.android.exoplayer:exoplayer-ui:r2.5.1'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 }

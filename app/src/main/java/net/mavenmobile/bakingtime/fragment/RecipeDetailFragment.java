@@ -1,12 +1,15 @@
 package net.mavenmobile.bakingtime.fragment;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -26,6 +30,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import net.mavenmobile.bakingtime.R;
@@ -64,6 +69,10 @@ public class RecipeDetailFragment extends Fragment {
     private ApiInterface apiService;
     private String TAG = "RecipeDetailFragment: ";
     private int position;
+    private boolean playWhenReady = true;
+    private int currentWindow;
+    private long playbackPosition;
+    private String videoUrl;
 
     public RecipeDetailFragment() {
         // Required empty public constructor
@@ -76,6 +85,14 @@ public class RecipeDetailFragment extends Fragment {
         RecipeDetailFragment fragment = new RecipeDetailFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("playWhenReady", playWhenReady);
+        outState.putInt("currentWindow", currentWindow);
+        outState.putLong("playbackPosition", playbackPosition);
     }
 
     @Override
@@ -98,6 +115,13 @@ public class RecipeDetailFragment extends Fragment {
 
         apiService = ApiClient.getClient().create(ApiInterface.class);
 
+        if (savedInstanceState != null) {
+            playWhenReady = savedInstanceState.getBoolean("playWhenReady");
+            currentWindow = savedInstanceState.getInt("currentWindow");
+            playbackPosition = savedInstanceState.getLong("playbackPosition");
+        }
+
+        buttonVisibilityCheck();
         initButton();
         initView(step);
         return view;
@@ -108,47 +132,122 @@ public class RecipeDetailFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (position > 0) {
-                    position-=1;
+                    position -= 1;
                     Step step = mStepList.get(position);
                     initView(step);
                 }
+                buttonVisibilityCheck();
             }
         });
         mButtonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (position < mStepList.size()) {
-                    position+=1;
+                    position += 1;
                     Step step = mStepList.get(position);
                     initView(step);
                 }
+                buttonVisibilityCheck();
             }
         });
     }
 
-    private void initView(Step step) {
-        mTvStepDesc.setText(step.getDescription());
-        String videoUrl = step.getVideoURL();
-        if (!TextUtils.isEmpty(videoUrl)) {
-            initPlayer(videoUrl);
-        } else {
-            mExoPlayer.setVisibility(View.GONE);
+    private void buttonVisibilityCheck() {
+        mButtonPrev.setVisibility(View.VISIBLE);
+        mButtonNext.setVisibility(View.VISIBLE);
+
+        if (position == 0) {
+            mButtonPrev.setVisibility(View.INVISIBLE);
+        } else if (position == mStepList.size() - 1) {
+            mButtonNext.setVisibility(View.INVISIBLE);
         }
     }
 
-    private void initPlayer(String url) {
-        mExoPlayer.setVisibility(View.VISIBLE);
+    private void initView(Step step) {
+        mTvStepDesc.setText(step.getDescription());
+        videoUrl = step.getVideoURL();
+        if (!videoUrl.isEmpty()) {
+            initializePlayer();
+            mExoPlayer.setVisibility(View.VISIBLE);
+        } else {
+            mExoPlayer.setVisibility(View.INVISIBLE);
+        }
+    }
 
-        TrackSelector trackSelector = new DefaultTrackSelector();
-        LoadControl loadControl = new DefaultLoadControl();
-        SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
-        mExoPlayer.setPlayer(player);
+    private void initializePlayer() {
+        mPlayer = ExoPlayerFactory.newSimpleInstance(
+                new DefaultRenderersFactory(getContext()),
+                new DefaultTrackSelector(), new DefaultLoadControl());
 
-        String userAgent = Util.getUserAgent(getContext(), getContext().getString(R.string.app_name));
-        MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(url), new DefaultDataSourceFactory
-                (getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
-        player.prepare(mediaSource);
-        player.setPlayWhenReady(false);
+        mExoPlayer.setPlayer(mPlayer);
+
+        mPlayer.setPlayWhenReady(playWhenReady);
+        mPlayer.seekTo(currentWindow, playbackPosition);
+
+        Uri uri = Uri.parse(videoUrl);
+        MediaSource mediaSource = buildMediaSource(uri);
+        mPlayer.prepare(mediaSource, true, false);
+    }
+
+    private MediaSource buildMediaSource(Uri uri) {
+        return new ExtractorMediaSource(uri,
+                new DefaultHttpDataSourceFactory("ua"),
+                new DefaultExtractorsFactory(), null, null);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            initializePlayer();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            hideSystemUi();
+        }
+        if ((Util.SDK_INT <= 23 || mPlayer == null)) {
+            initializePlayer();
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    private void hideSystemUi() {
+        mExoPlayer.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+    }
+
+    private void releasePlayer() {
+        if (mPlayer != null) {
+            playbackPosition = mPlayer.getCurrentPosition();
+            currentWindow = mPlayer.getCurrentWindowIndex();
+            playWhenReady = mPlayer.getPlayWhenReady();
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
 
     @Override
@@ -161,6 +260,5 @@ public class RecipeDetailFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
     }
-
 
 }

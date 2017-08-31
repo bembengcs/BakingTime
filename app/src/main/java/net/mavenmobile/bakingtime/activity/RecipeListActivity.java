@@ -1,12 +1,17 @@
 package net.mavenmobile.bakingtime.activity;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import net.mavenmobile.bakingtime.R;
 import net.mavenmobile.bakingtime.adapter.IngredietAdapter;
@@ -17,9 +22,10 @@ import net.mavenmobile.bakingtime.model.Recipe;
 import net.mavenmobile.bakingtime.model.Step;
 import net.mavenmobile.bakingtime.rest.ApiClient;
 import net.mavenmobile.bakingtime.rest.ApiInterface;
+import net.mavenmobile.bakingtime.config.Constants;
+import net.mavenmobile.bakingtime.widget.IngredientsAppWidget;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,10 +44,16 @@ public class RecipeListActivity extends AppCompatActivity implements StepAdapter
     private Recipe recipe;
     private String TAG = RecipeListActivity.class.getSimpleName();
     private IngredietAdapter mIngredientAdapter;
+    private Ingredient mIngredient;
     private List<Ingredient> mIngredientList;
+    private ArrayList<Ingredient> ingredientsArray = new ArrayList<>();
     private StepAdapter mStepAdapter;
     private List<Step> mStepList;
     private boolean mTwoPane;
+    private ArrayList<Step> stepArray = new ArrayList<>();
+    private int position;
+    private int type;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +101,7 @@ public class RecipeListActivity extends AppCompatActivity implements StepAdapter
 
     @Override
     public void onItemClick(int position) {
-
-        ArrayList<Step> stepArray = new ArrayList<>();
         stepArray.addAll(mStepList);
-
 
         if (mTwoPane) {
             Bundle args = new Bundle();
@@ -111,4 +120,34 @@ public class RecipeListActivity extends AppCompatActivity implements StepAdapter
             startActivity(intent);
         }
     }
+
+    private void updateWidget() {
+        Constants.widget.clear();
+        ingredientsArray.addAll(mIngredientList);
+        Constants.widget = ingredientsArray;
+
+        AppWidgetManager manager = AppWidgetManager.getInstance(getApplicationContext());
+        int[] appWidgetIds = manager.getAppWidgetIds(new ComponentName(getApplicationContext(), IngredientsAppWidget.class));
+        manager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
+
+        Toast.makeText(getApplicationContext(), getString(R.string.saved), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save_widget:
+                updateWidget();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 }

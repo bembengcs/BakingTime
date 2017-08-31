@@ -1,9 +1,15 @@
 <resources>
-    <string name="app_name">BakingTime</string>
+    <string name="app_name">Baking Time</string>
     <string name="title_item_detail">Item Detail</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="btn_prev">PREV</string>
     <string name="btn_next">NEXT</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="appwidget_ingredient">INGREDIENTS</string>
+    <string name="add_widget">Add widget</string>
+    <string name="widget_title">List Ingredients</string>
+    <string name="save_to_widget">Save to Widget</string>
+    <string name="saved">Saved to Widget!</string>
 </resources>

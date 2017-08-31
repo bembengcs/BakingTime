@@ -47,8 +47,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
         step = mStepList.get(position);
 
-
-
         if (savedInstanceState == null) {
             RecipeDetailFragment detailFragment = new RecipeDetailFragment();
             FragmentManager fm = getSupportFragmentManager();

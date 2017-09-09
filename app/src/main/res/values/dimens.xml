@@ -25,4 +25,8 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <dimen name="dimen_10dp">10dp</dimen>
     <dimen name="widget_padding">8dp</dimen>
     <dimen name="widget_size">240dp</dimen>
+    <dimen name="dimen_20dp">20dp</dimen>
+    <dimen name="dimen_40dp">40dp</dimen>
+    <dimen name="dimen_16dp">16dp</dimen>
+    <dimen name="video_height">200dp</dimen>
 </resources>

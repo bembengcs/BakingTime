@@ -14,6 +14,7 @@ public final class Constants {
     public Constants() {
     }
 
-    public static final int VIEW_TYPE_IN_LIST = 1;
+    public static String EXTRA_CURRENT_POSITION = "EXTRA_CURRENT_POSITION";
+    public final static int VIEW_TYPE_IN_LIST = 1;
     public static ArrayList<Ingredient> widget = new ArrayList<>();
 }

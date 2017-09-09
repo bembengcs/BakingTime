@@ -5,7 +5,7 @@
     android:initialLayout="@layout/ingredient_app_widget"
     android:minHeight="@dimen/widget_size"
     android:minWidth="@dimen/widget_size"
-    android:previewImage="@drawable/example_appwidget_preview"
+    android:previewImage="@drawable/appwidget_preview"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="86400000"
     android:widgetCategory="home_screen">

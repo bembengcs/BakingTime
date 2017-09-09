@@ -5,24 +5,24 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import net.mavenmobile.bakingtime.R;
 import net.mavenmobile.bakingtime.adapter.IngredietAdapter;
 import net.mavenmobile.bakingtime.adapter.StepAdapter;
+import net.mavenmobile.bakingtime.config.Constants;
 import net.mavenmobile.bakingtime.fragment.RecipeDetailFragment;
 import net.mavenmobile.bakingtime.model.Ingredient;
 import net.mavenmobile.bakingtime.model.Recipe;
 import net.mavenmobile.bakingtime.model.Step;
-import net.mavenmobile.bakingtime.rest.ApiClient;
-import net.mavenmobile.bakingtime.rest.ApiInterface;
-import net.mavenmobile.bakingtime.config.Constants;
 import net.mavenmobile.bakingtime.widget.IngredientsAppWidget;
 
 import java.util.ArrayList;
@@ -37,22 +37,21 @@ public class RecipeListActivity extends AppCompatActivity implements StepAdapter
     RecyclerView mRvIngredient;
     @BindView(R.id.rv_step)
     RecyclerView mRvStep;
+    @BindView(R.id.nested_scroll_view)
+    NestedScrollView mNestedScrollView;
     @BindView(R.id.recipe_list_container)
     FrameLayout mRecipeListContainer;
 
-    private ApiInterface apiService;
-    private Recipe recipe;
     private String TAG = RecipeListActivity.class.getSimpleName();
-    private IngredietAdapter mIngredientAdapter;
-    private Ingredient mIngredient;
-    private List<Ingredient> mIngredientList;
-    private ArrayList<Ingredient> ingredientsArray = new ArrayList<>();
-    private StepAdapter mStepAdapter;
-    private List<Step> mStepList;
+    private Recipe recipe;
     private boolean mTwoPane;
+    private List<Ingredient> mIngredientList;
+    private IngredietAdapter mIngredientAdapter;
+    private ArrayList<Ingredient> ingredientsArray = new ArrayList<>();
+    private List<Step> mStepList;
+    private StepAdapter mStepAdapter;
     private ArrayList<Step> stepArray = new ArrayList<>();
-    private int position;
-    private int type;
+    private final String EXTRA_KEY_CURRENT_POSITION = "current_position";
 
 
     @Override
@@ -61,7 +60,6 @@ public class RecipeListActivity extends AppCompatActivity implements StepAdapter
         setContentView(R.layout.activity_recipe_list);
         ButterKnife.bind(this);
 
-        apiService = ApiClient.getClient().create(ApiInterface.class);
         recipe = getIntent().getExtras().getParcelable("recipe");
 
         mIngredientList = new ArrayList<>();
@@ -70,6 +68,10 @@ public class RecipeListActivity extends AppCompatActivity implements StepAdapter
         mStepList.addAll(recipe.getSteps());
         mRvIngredient.setNestedScrollingEnabled(false);
         mRvStep.setNestedScrollingEnabled(false);
+
+        if (savedInstanceState != null) {
+
+        }
 
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
@@ -81,6 +83,25 @@ public class RecipeListActivity extends AppCompatActivity implements StepAdapter
 
         setupIngredientAdapter();
         setupStepAdapter();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putIntArray(EXTRA_KEY_CURRENT_POSITION,
+                new int[]{mNestedScrollView.getScrollX(), mNestedScrollView.getScrollY()});
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        final int[] position = savedInstanceState.getIntArray("RECIPE_SCROLL_POSITION");
+        if (position != null)
+            mNestedScrollView.post(new Runnable() {
+                public void run() {
+                    mNestedScrollView.scrollTo(position[0], position[1]);
+                }
+            });
     }
 
     private void setupIngredientAdapter() {

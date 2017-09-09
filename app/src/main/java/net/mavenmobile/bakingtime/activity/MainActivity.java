@@ -3,17 +3,23 @@ package net.mavenmobile.bakingtime.activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import net.mavenmobile.bakingtime.R;
 import net.mavenmobile.bakingtime.adapter.RecipeAdapter;
+import net.mavenmobile.bakingtime.idlingresource.SimpleIdlingResource;
 import net.mavenmobile.bakingtime.model.Recipe;
 import net.mavenmobile.bakingtime.rest.ApiClient;
 import net.mavenmobile.bakingtime.rest.ApiInterface;
@@ -26,22 +32,41 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.content.ContentValues.TAG;
-
 public class MainActivity extends AppCompatActivity implements RecipeAdapter.OnItemClickListener {
 
     @BindView(R.id.rv_recipe_card)
     RecyclerView mRvRecipeCard;
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
+    @BindView(R.id.recipe_layout_container)
+    LinearLayout mLinearLayout;
     private ApiInterface apiService;
     private RecipeAdapter mRecipeCardAdapter;
+    private LinearLayoutManager mLinearLayoutManager;
+
+    @Nullable
+    private SimpleIdlingResource mIdlingResource;
+
+    /**
+     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
+     */
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        mRvRecipeCard.setLayoutManager(mLinearLayoutManager);
 
         apiService =
                 ApiClient.getClient().create(ApiInterface.class);

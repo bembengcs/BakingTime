@@ -12,4 +12,5 @@
     <string name="widget_title">List Ingredients</string>
     <string name="save_to_widget">Save to Widget</string>
     <string name="saved">Saved to Widget!</string>
+    <string name="tv_ingredients_label">Ingredients:</string>
 </resources>

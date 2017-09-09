@@ -1,12 +1,16 @@
 package net.mavenmobile.bakingtime.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import net.mavenmobile.bakingtime.R;
 import net.mavenmobile.bakingtime.model.Step;
@@ -39,6 +43,8 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
         TextView mTvStepNumber;
         @BindView(R.id.tv_step_name)
         TextView mTvStepName;
+        @BindView(R.id.iv_thumbnail)
+        ImageView mIvThumbnail;
         @BindView(R.id.relative_layout)
         RelativeLayout mRelativeLayout;
 
@@ -48,6 +54,12 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
         }
 
         public void bind(final Step step, final int position) {
+
+            Glide.with(mContext)
+                    .load(step.getThumbnailURL())
+                    .placeholder(R.drawable.ic_insert_photo)
+                    .error(R.drawable.ic_broken_image)
+                    .into(mIvThumbnail);
 
             if (step.getId() == 0) {
                 mTvStepNumber.setText("Introduction");

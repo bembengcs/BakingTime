@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import net.mavenmobile.bakingtime.R;
 import net.mavenmobile.bakingtime.model.Recipe;
 
@@ -37,8 +39,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.MyViewHold
     public class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.iv_cake)
         ImageView mIvCake;
-        @BindView(R.id.iv_icon)
-        ImageView mIvIcon;
         @BindView(R.id.tv_recipe_name)
         TextView mTvRecipeName;
         @BindView(R.id.tv_servings)
@@ -58,11 +58,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.MyViewHold
         }
 
         public void bind(final Recipe recipe) {
+            Glide.with(mContext)
+                    .load(recipe.getImage())
+                    .placeholder(R.drawable.ic_insert_photo)
+                    .error(R.drawable.ic_broken_image)
+                    .into(mIvCake);
             mTvRecipeName.setText(recipe.getName());
             mTvServings.setText("Serves: " + String.valueOf(recipe.getServings()));
-//            mTvIngredients.setText(" | Ingredients: " + recipe.getIngredients().size());
-//            mTvSteps.setText(" | Steps: " + recipe.getSteps().size());
-
             mRelativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -81,15 +83,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.MyViewHold
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         holder.bind(mRecipeList.get(position));
-        if (position == 0) {
-            holder.mIvCake.setImageResource(R.drawable.nutellapie);
-        } else if (position == 1) {
-            holder.mIvCake.setImageResource(R.drawable.brownies);
-        } else if (position == 2) {
-            holder.mIvCake.setImageResource(R.drawable.yellowcake);
-        } else if (position == 3) {
-            holder.mIvCake.setImageResource(R.drawable.cheesecake);
-        }
     }
 
     @Override

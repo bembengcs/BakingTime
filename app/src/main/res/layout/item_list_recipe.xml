@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/nested_scroll_view"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
@@ -22,11 +23,10 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_ingridient_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_layout_margin"
-                    android:text="Ingredients: "
+                    android:text="@string/tv_ingredients_label"
                     android:textColor="@color/colorPrimary"
                     android:textSize="@dimen/text_medium"/>
 

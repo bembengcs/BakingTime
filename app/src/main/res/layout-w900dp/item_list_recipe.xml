@@ -10,6 +10,7 @@
     android:showDividers="middle">
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nested_scroll_view"
         android:layout_width="@dimen/item_list_width"
         android:layout_height="match_parent">
 
@@ -17,6 +18,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_layout_margin"
+                android:text="@string/tv_ingredients_label"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_medium"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_ingredient"

@@ -8,31 +8,23 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
@@ -42,7 +34,6 @@ import net.mavenmobile.bakingtime.rest.ApiClient;
 import net.mavenmobile.bakingtime.rest.ApiInterface;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -55,8 +46,8 @@ import butterknife.Unbinder;
 public class RecipeDetailFragment extends Fragment {
 
 
-    @BindView(R.id.exo_player)
-    SimpleExoPlayerView mExoPlayer;
+    @BindView(R.id.player_view)
+    SimpleExoPlayerView mPlayerView;
     @BindView(R.id.tv_step_desc)
     TextView mTvStepDesc;
     Unbinder unbinder;
@@ -64,6 +55,8 @@ public class RecipeDetailFragment extends Fragment {
     ImageButton mButtonPrev;
     @BindView(R.id.button_next)
     ImageButton mButtonNext;
+    @BindView(R.id.iv_thumbnail)
+    ImageView mIvThumbnail;
 
     private Context mContext;
     private SimpleExoPlayer mPlayer;
@@ -125,8 +118,8 @@ public class RecipeDetailFragment extends Fragment {
         }
 
         buttonVisibilityCheck();
-        initButton();
         initView(step);
+        initButton();
         return view;
     }
 
@@ -137,7 +130,9 @@ public class RecipeDetailFragment extends Fragment {
                 if (position > 0) {
                     position -= 1;
                     Step step = mStepList.get(position);
+                    releasePlayer();
                     initView(step);
+                    initializePlayer(step);
                 }
                 buttonVisibilityCheck();
             }
@@ -148,7 +143,9 @@ public class RecipeDetailFragment extends Fragment {
                 if (position < mStepList.size()) {
                     position += 1;
                     Step step = mStepList.get(position);
+                    releasePlayer();
                     initView(step);
+                    initializePlayer(step);
                 }
                 buttonVisibilityCheck();
             }
@@ -167,26 +164,26 @@ public class RecipeDetailFragment extends Fragment {
     }
 
     private void initView(Step step) {
+        Glide.with(getContext())
+                .load(step.getThumbnailURL())
+                .placeholder(R.drawable.ic_insert_photo)
+                .error(R.drawable.ic_broken_image)
+                .into(mIvThumbnail);
         mTvStepDesc.setText(step.getDescription());
-        videoUrl = step.getVideoURL();
-        if (!videoUrl.isEmpty()) {
-            initializePlayer();
-            mExoPlayer.setVisibility(View.VISIBLE);
-        } else {
-            mExoPlayer.setVisibility(View.INVISIBLE);
-        }
     }
 
-    private void initializePlayer() {
+    private void initializePlayer(Step step) {
         mPlayer = ExoPlayerFactory.newSimpleInstance(
                 new DefaultRenderersFactory(getContext()),
                 new DefaultTrackSelector(), new DefaultLoadControl());
 
-        mExoPlayer.setPlayer(mPlayer);
+        mPlayerView.setPlayer(mPlayer);
 
+        mIvThumbnail.setVisibility(View.GONE);
         mPlayer.setPlayWhenReady(playWhenReady);
         mPlayer.seekTo(currentWindow, playbackPosition);
 
+        videoUrl = step.getVideoURL();
         Uri uri = Uri.parse(videoUrl);
         MediaSource mediaSource = buildMediaSource(uri);
         mPlayer.prepare(mediaSource, true, false);
@@ -202,7 +199,7 @@ public class RecipeDetailFragment extends Fragment {
     public void onStart() {
         super.onStart();
         if (Util.SDK_INT > 23) {
-            initializePlayer();
+            initializePlayer(step);
         }
     }
 
@@ -213,13 +210,13 @@ public class RecipeDetailFragment extends Fragment {
             hideSystemUi();
         }
         if ((Util.SDK_INT <= 23 || mPlayer == null)) {
-            initializePlayer();
+            initializePlayer(step);
         }
     }
 
     @SuppressLint("InlinedApi")
     private void hideSystemUi() {
-        mExoPlayer.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+        mPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY

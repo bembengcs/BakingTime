@@ -1,4 +1,4 @@
-package net.mavenmobile.bakingtime.Utils;
+package net.mavenmobile.bakingtime.utils;
 
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;

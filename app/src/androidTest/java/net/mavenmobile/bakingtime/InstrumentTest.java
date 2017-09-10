@@ -61,7 +61,7 @@ public class InstrumentTest {
         onView(ViewMatchers.withId(R.id.rv_recipe_card))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         onView(ViewMatchers.withId(R.id.rv_ingredient))
-                .perform(net.mavenmobile.bakingtime.Utils.ScrollToAction.betterScrollTo());
+                .perform(net.mavenmobile.bakingtime.utils.ScrollToAction.betterScrollTo());
         onView(withText("Graham Cracker crumbs"))
                 .check(matches(isDisplayed()));
     }
@@ -71,7 +71,7 @@ public class InstrumentTest {
         onView(ViewMatchers.withId(R.id.rv_recipe_card))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         onView(ViewMatchers.withId(R.id.rv_step))
-                .perform(net.mavenmobile.bakingtime.Utils.ScrollToAction.betterScrollTo())
+                .perform(net.mavenmobile.bakingtime.utils.ScrollToAction.betterScrollTo())
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
     }
 
@@ -79,7 +79,7 @@ public class InstrumentTest {
         onView(ViewMatchers.withId(R.id.rv_recipe_card))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         onView(ViewMatchers.withId(R.id.rv_step))
-                .perform(net.mavenmobile.bakingtime.Utils.ScrollToAction.betterScrollTo())
+                .perform(net.mavenmobile.bakingtime.utils.ScrollToAction.betterScrollTo())
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         Thread.sleep(10000);
         onView(allOf(withId(R.id.player_view),

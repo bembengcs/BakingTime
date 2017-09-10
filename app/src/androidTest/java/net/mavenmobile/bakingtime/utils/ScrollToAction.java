@@ -1,4 +1,4 @@
-package net.mavenmobile.bakingtime.Utils;
+package net.mavenmobile.bakingtime.utils;
 
 import android.graphics.Rect;
 import android.support.test.espresso.PerformException;
